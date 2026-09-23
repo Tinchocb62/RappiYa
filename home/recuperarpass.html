@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RappiYa</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Recuperar contraseña</h1>
+    </header>
+
+    <main>
+
+        <div class="form">
+
+            <form id="recuperarForm">
+
+                <p class="email">Correo electrónico</p>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Ingrese su correo electrónico"
+                >
+
+                <p id="mensaje"></p>
+
+                <button type="submit">
+                    Recuperar contraseña
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="create-account">
+
+            <p>¿Recordaste tu contraseña?</p>
+
+            <a href="index.html">
+                Volver al inicio de sesión
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer></footer>
+
+
+    <script>
+
+        const formulario = document.getElementById("recuperarForm");
+        const mensaje = document.getElementById("mensaje");
+
+
+        formulario.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+
+            const email = document.getElementById("email").value;
+
+
+            const respuesta = await fetch("http://localhost:3000/recuperar", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email
+                })
+
+            });
+
+
+            const datos = await respuesta.json();
+
+
+            if (datos.success) {
+
+                // Por ahora pasamos directamente
+                // a la página de restablecimiento
+
+                window.location.href = "restablecer.html";
+
+            } else {
+
+                mensaje.textContent = datos.message;
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

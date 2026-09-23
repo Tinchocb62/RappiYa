@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RappiYa</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Inicio de sesión</h1>
+    </header>
+
+    <main>
+
+        <div class="form">
+
+            <form id="loginForm">
+
+                <p class="email">Correo electrónico</p>
+
+                <input type="email" id="email" name="email" placeholder="Ingrese su correo electrónico">
+
+                <p class="password">Contraseña</p>
+
+                <input type="password" id="password" name="password" placeholder="Ingrese su contraseña">
+
+                <a href="recuperarpass.html">
+                    ¿Olvidaste tu contraseña?
+                </a>
+
+                <p id="mensaje"></p>
+
+                <button type="submit">
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="account-link">
+            <a href="registro.html">Crear una cuenta</a>
+        </div>
+
+    </main>
+
+    <footer></footer>
+
+
+    <script src="login.js">
+
+        const formulario = document.getElementById("loginForm");
+        const mensaje = document.getElementById("mensaje");
+
+        formulario.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const respuesta = await fetch("http://localhost:3000/login", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+
+            });
+
+            const datos = await respuesta.json();
+
+            if (datos.success) {
+
+                window.location.href = "index.html";
+
+            } else {
+
+                mensaje.textContent = "Credenciales inválidas";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

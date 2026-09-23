@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RappiYa</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Restablecer contraseña</h1>
+    </header>
+
+    <main>
+
+        <div class="form">
+
+            <form id="restablecerForm">
+
+                <p class="password">Nueva contraseña</p>
+
+                <input type="password" id="password" name="password" placeholder="Ingrese su nueva contraseña">
+
+
+                <p class="password">Confirmar contraseña</p>
+
+                <input type="password" id="confirmPassword" name="confirmPassword"
+                    placeholder="Repita su nueva contraseña">
+
+
+                <p id="mensaje"></p>
+
+
+                <button type="submit">
+                    Restablecer contraseña
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="create-account">
+
+            <a href="login.html">
+                Volver al inicio de sesión
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer></footer>
+
+
+    <script>
+
+        const formulario = document.getElementById("restablecerForm");
+        const mensaje = document.getElementById("mensaje");
+
+
+        formulario.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+
+            const password = document.getElementById("password").value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+
+            // Comprobar que las contraseñas coincidan
+
+            if (password !== confirmPassword) {
+
+                mensaje.textContent =
+                    "Las contraseñas no coinciden";
+
+                return;
+            }
+
+
+            // Enviar la nueva contraseña al backend
+
+            const respuesta = await fetch("http://localhost:3000/restablecer", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    password: password
+                })
+
+            });
+
+
+            const datos = await respuesta.json();
+
+
+            if (datos.success) {
+
+                mensaje.textContent =
+                    "Contraseña restablecida correctamente";
+
+
+                // Después de unos segundos,
+                // volvemos al login
+
+                setTimeout(() => {
+
+                    window.location.href = "login.html";
+
+                }, 2000);
+
+
+            } else {
+
+                mensaje.textContent = datos.message;
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
