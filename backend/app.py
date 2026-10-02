@@ -127,17 +127,16 @@ def login():
 
         # Si el usuario no existe, devolvemos error genérico por seguridad
         if not usuario:
-            return jsonify({"success": False, "message": "Credenciales inválidas"}), 401
+            return jsonify({"success": False, "message": "Usuario o contraseña incorrectos"}), 401
 
         # Control de cuenta inactiva
         if usuario["estado"] != 1:
-            return jsonify({"success": False, "message": "Tu cuenta se encuentra deshabilitada"}), 403
+            return jsonify({"success": False, "message": "Tu cuenta se encuentra suspendida"}), 403
 
         # Verificar hash de contraseña
         coincide = bcrypt.checkpw(password.encode("utf-8"), usuario["password"].encode("utf-8"))
         if not coincide:
-            return jsonify({"success": False, "message": "Credenciales inválidas"}), 401
-
+            return jsonify({"success": False, "message": "Usuario o contraseña incorrectos"}), 401
         return jsonify({
             "success": True,
             "message": "Inicio de sesión exitoso",
