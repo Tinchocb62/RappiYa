@@ -1,101 +1,113 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RappiYa</title>
-
+    <title>RappiYa - Inicio de sesión</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <header>
-        <h1>Inicio de sesión</h1>
+        <h1>Iniciar sesión</h1>
     </header>
-
     <main>
-
         <div class="form">
-
-            <form id="loginForm">
-
-                <p class="email">Correo electrónico</p>
-
+            <form id="loginForm" novalidate>
+                <label for="email">Correo electrónico</label>
                 <input type="email" id="email" name="email" placeholder="Ingrese su correo electrónico">
+                <span class="error-msg" id="error-email"></span>
 
-                <p class="password">Contraseña</p>
-
+                <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" placeholder="Ingrese su contraseña">
+                <span class="error-msg" id="error-password"></span>
 
-                <a href="recuperarpass.html">
-                    ¿Olvidaste tu contraseña?
-                </a>
+                <div class="forgot-password">
+                    <a href="recuperarpass.html">¿Olvidaste tu contraseña?</a>
+                </div>
 
                 <p id="mensaje"></p>
 
-                <button type="submit">
-                    Iniciar sesión
-                </button>
-
+                <button type="submit">Iniciar sesión</button>
             </form>
-
         </div>
-
         <div class="account-link">
+            <span>¿No tenés una cuenta?</span>
             <a href="registro.html">Crear una cuenta</a>
         </div>
-
     </main>
-
     <footer></footer>
 
-
-    <script src="login.js">
-
+    <script>
         const formulario = document.getElementById("loginForm");
-        const mensaje = document.getElementById("mensaje");
+        const mensajeGeneral = document.getElementById("mensaje");
+
+        const inputEmail = document.getElementById("email");
+        const inputPassword = document.getElementById("password");
+
+        const errorEmail = document.getElementById("error-email");
+        const errorPassword = document.getElementById("error-password");
+
+        function mostrarError(input, span, texto) {
+            input.classList.add("input-error");
+            span.textContent = texto;
+            span.classList.add("activo");
+        }
+
+        function limpiarError(input, span) {
+            input.classList.remove("input-error");
+            span.textContent = "";
+            span.classList.remove("activo");
+        }
+
+        inputEmail.addEventListener("input", () => limpiarError(inputEmail, errorEmail));
+        inputPassword.addEventListener("input", () => limpiarError(inputPassword, errorPassword));
 
         formulario.addEventListener("submit", async (event) => {
-
             event.preventDefault();
+            mensajeGeneral.textContent = "";
+            mensajeGeneral.className = "";
 
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            let hayErrores = false;
 
-            const respuesta = await fetch("http://localhost:3000/login", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-
-            });
-
-            const datos = await respuesta.json();
-
-            if (datos.success) {
-
-                window.location.href = "index.html";
-
-            } else {
-
-                mensaje.textContent = "Credenciales inválidas";
-
+            if (inputEmail.value.trim() === "") {
+                mostrarError(inputEmail, errorEmail, "Ingresá tu correo electrónico");
+                hayErrores = true;
             }
 
+            if (inputPassword.value === "") {
+                mostrarError(inputPassword, errorPassword, "Ingresá tu contraseña");
+                hayErrores = true;
+            }
+
+            if (hayErrores) return;
+
+            try {
+                const respuesta = await fetch("http://localhost:3000/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: inputEmail.value.trim(),
+                        password: inputPassword.value
+                    })
+                });
+
+                const datos = await respuesta.json();
+
+                if (datos.success) {
+                    mensajeGeneral.className = "exito";
+                    mensajeGeneral.textContent = `¡Bienvenido/a, ${datos.usuario.nombre}!`;
+                    sessionStorage.setItem("usuario", JSON.stringify(datos.usuario));
+                    formulario.reset();
+                } else {
+                    mensajeGeneral.className = "error";
+                    mensajeGeneral.textContent = datos.message;
+                    inputPassword.value = "";
+                }
+            } catch (error) {
+                mensajeGeneral.className = "error";
+                mensajeGeneral.textContent = "No se pudo conectar con el servidor";
+            }
         });
-
     </script>
-
 </body>
-
 </html>

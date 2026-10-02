@@ -1,452 +1,508 @@
+/* =========================================================
+   VARIABLES DE TIEMPO Y CURVAS DE TRANSICIÓN
+   ========================================================= */
+:root {
+    --bg-base: #070a0f;
+    --card-surface: rgba(14, 20, 29, 0.88);
+    --card-border: rgba(255, 255, 255, 0.08);
+
+    --input-surface: rgba(18, 25, 36, 0.75);
+    --input-border: rgba(255, 255, 255, 0.09);
+    --input-focus-border: #ff4d5e;
+
+    --texto-titulo: #ffffff;
+    --texto-etiqueta: #7a889b;
+    --texto-placeholder: #455263;
+    --texto-principal: #f3f6fa;
+    --texto-enlace: #8a98a8;
+
+    --coral-primario: #ff4f60;
+    --coral-secundario: #ff384b;
+    --coral-glow: rgba(255, 79, 96, 0.55);
+    --coral-glow-intenso: rgba(255, 79, 96, 0.85);
+
+    --aura-roja: rgba(230, 45, 66, 0.42);
+    --aura-teal: rgba(12, 110, 128, 0.38);
+
+    /* Curvas de aceleración cinematográficas */
+    --ease-elastic: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --trans-fast: 0.2s var(--ease-smooth);
+    --trans-medium: 0.35s var(--ease-elastic);
+}
+
 * {
     box-sizing: border-box;
 }
 
-:root {
-    --naranja: #FF6B00;
-    --naranja-suave: rgba(255, 107, 0, 0.10);
-
-    --azul-petroleo: #123C4A;
-    --azul-suave: rgba(18, 60, 74, 0.08);
-
-    --gris-grafito: #292929;
-    --gris-secundario: #666666;
-
-    --fondo: #EEF1F2;
-    --blanco: #FFFFFF;
-    --borde: #D4D9DC;
-}
-
-
-/* =========================================================
-   CUERPO
-   ========================================================= */
-
 body {
     margin: 0;
-
-    font-family: Arial, sans-serif;
-
-    color: var(--gris-grafito);
-
     min-height: 100vh;
-
-    /*
-        Fondo principal.
-        Las formas se generan con pseudo-elementos.
-    */
-
-    background-color: var(--fondo);
-
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--texto-principal);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: relative;
-
     overflow-x: hidden;
+    padding: 24px;
 }
 
-
-/* =========================================================
-   FORMAS DECORATIVAS DEL FONDO
-   ========================================================= */
-
+/* Luces ambientales con transición fluida continua */
 body::before {
     content: "";
-
     position: fixed;
-
-    width: 500px;
-    height: 500px;
-
-    top: -250px;
-    left: -180px;
-
-    background: var(--naranja-suave);
-
-    border-radius: 50%;
-
-    filter: blur(20px);
-
+    width: 680px;
+    height: 680px;
+    top: -240px;
+    left: 22%;
+    background: radial-gradient(circle at center, var(--aura-roja) 0%, rgba(230, 45, 66, 0.1) 45%, transparent 70%);
+    filter: blur(90px);
+    opacity: 0.75;
     pointer-events: none;
-
-    z-index: -1;
+    z-index: 0;
+    animation: derivaLuzRoja 14s var(--ease-smooth) infinite alternate;
 }
-
 
 body::after {
     content: "";
-
     position: fixed;
-
-    width: 550px;
-    height: 550px;
-
-    right: -250px;
+    width: 780px;
+    height: 780px;
     bottom: -280px;
-
-    background: var(--azul-suave);
-
-    border-radius: 50%;
-
-    filter: blur(25px);
-
+    right: -100px;
+    background: radial-gradient(circle at center, var(--aura-teal) 0%, rgba(12, 110, 128, 0.08) 50%, transparent 75%);
+    filter: blur(100px);
+    opacity: 0.8;
     pointer-events: none;
-
-    z-index: -1;
+    z-index: 0;
+    animation: derivaLuzTeal 18s var(--ease-smooth) infinite alternate;
 }
 
+@keyframes derivaLuzRoja {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, 35px) scale(1.08);
+    }
+}
+
+@keyframes derivaLuzTeal {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(-40px, -30px) scale(1.1);
+    }
+}
 
 /* =========================================================
-   HEADER
+   1. TRANSICIÓN DE ENTRADA ESCALONADA (STAGGERED LOAD)
    ========================================================= */
-
 header {
     text-align: center;
-
-    padding: 45px 20px 30px;
+    margin-bottom: 22px;
+    z-index: 1;
+    animation: bajarTitulo 0.7s var(--ease-elastic) both;
 }
 
+@keyframes bajarTitulo {
+    from {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 header h1 {
     margin: 0;
-
-    color: var(--azul-petroleo);
-
-    font-size: 28px;
-
-    font-weight: 600;
-
-    letter-spacing: -0.3px;
+    color: var(--texto-titulo);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
 }
 
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-main {
-    display: flex;
-
+/* Onda expansiva continua */
+.dot-container {
+    position: relative;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-
-    flex-direction: column;
+    width: 12px;
+    height: 12px;
 }
 
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--coral-primario);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--coral-primario), 0 0 20px var(--coral-glow);
+    z-index: 2;
+    transition: transform var(--trans-fast);
+}
 
-/* =========================================================
-   FORMULARIO
-   ========================================================= */
+.dot-container::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--coral-primario);
+    z-index: 1;
+    animation: ondaRadar 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes ondaRadar {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    70% {
+        transform: scale(3.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(3.5);
+        opacity: 0;
+    }
+}
+
+/* Entrada de la tarjeta con escala progresiva */
+main {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    animation: entradaCard 0.75s var(--ease-elastic) 0.12s both;
+}
+
+@keyframes entradaCard {
+    from {
+        opacity: 0;
+        transform: translateY(28px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
 .form {
-    width: 400px;
-
-    padding: 32px;
-
-    background-color: var(--blanco);
-
-    border: 1px solid rgba(18, 60, 74, 0.08);
-
-    border-radius: 10px;
-
-    /*
-        Sombra muy suave.
-        Da profundidad sin hacer que parezca una interfaz
-        demasiado moderna.
-    */
-
-    box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.06),
-        0 3px 10px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    padding: 34px 28px;
+    background: var(--card-surface);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: border-color var(--trans-medium), box-shadow var(--trans-medium);
 }
 
+.form:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 35px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
 
 form {
     display: flex;
-
     flex-direction: column;
 }
 
-
 /* =========================================================
-   ETIQUETAS
+   2. TRANSICIÓN EN INPUTS Y LABELS
    ========================================================= */
-
 label {
-    margin-bottom: 8px;
-
-    color: var(--gris-grafito);
-
-    font-size: 15px;
-
-    font-weight: 600;
+    margin-bottom: 7px;
+    color: var(--texto-etiqueta);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    transition: color var(--trans-fast), transform var(--trans-fast);
 }
-
-
-form p.email,
-form p.password,
-form p.name {
-    margin: 0 0 8px;
-
-    color: var(--gris-grafito);
-
-    font-size: 15px;
-
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
 
 input {
     width: 100%;
-
-    padding: 12px;
-
-    margin-bottom: 20px;
-
-    border: 1px solid var(--borde);
-
-    border-radius: 5px;
-
-    background-color: var(--blanco);
-
-    color: var(--gris-grafito);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 14px;
-
+    padding: 13px 15px;
+    margin-bottom: 6px;
+    /* Ajustado para que el contenedor del error no salte */
+    border: 1px solid var(--input-border);
+    border-radius: 7px;
+    background-color: var(--input-surface);
+    color: var(--texto-principal);
+    font-size: 13.5px;
     outline: none;
-
+    transform: translateZ(0);
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease;
+        border-color 0.25s var(--ease-smooth),
+        background-color 0.25s var(--ease-smooth),
+        box-shadow 0.25s var(--ease-smooth),
+        transform 0.25s var(--ease-elastic);
 }
-
 
 input::placeholder {
-    color: #999999;
+    color: var(--texto-placeholder);
+    font-size: 13px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
-
 
 input:hover {
-    border-color: #BEC5C9;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(22, 31, 44, 0.85);
 }
 
-
+/* Foco con sutil avance tridimensional */
 input:focus {
-    border-color: var(--azul-petroleo);
-
-    background-color: #FCFDFD;
-
+    border-color: var(--input-focus-border);
+    background-color: rgba(24, 34, 48, 0.95);
+    transform: translateY(-1px);
     box-shadow:
-        0 0 0 3px rgba(18, 60, 74, 0.07);
+        0 0 0 3px rgba(255, 79, 96, 0.18),
+        0 8px 20px rgba(255, 79, 96, 0.12);
 }
 
+input:focus::placeholder {
+    opacity: 0.5;
+    transform: translateX(3px);
+}
 
 /* =========================================================
-   BOTÓN
+   3. DESPLIEGUE SUAVE DE ERRORES (ACORDEÓN FLUIDO)
    ========================================================= */
+.error-msg {
+    color: #ff6b7a;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    text-align: left;
 
-button {
+    /* En lugar de display: none, animamos altura y opacidad */
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    overflow: hidden;
+    margin-bottom: 12px;
+    transition:
+        max-height 0.3s cubic-bezier(0, 1, 0, 1),
+        opacity 0.25s var(--ease-smooth),
+        transform 0.25s var(--ease-elastic),
+        margin 0.25s ease;
+}
+
+.error-msg.activo {
+    max-height: 40px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 4px;
+    margin-bottom: 14px;
+    transition:
+        max-height 0.35s ease-in-out,
+        opacity 0.3s var(--ease-smooth),
+        transform 0.3s var(--ease-elastic);
+}
+
+/* Sacudida controlada sin romper la posición del contenedor */
+input.input-error {
+    border-color: #ff4f60 !important;
+    background-color: rgba(255, 79, 96, 0.08) !important;
+    box-shadow: 0 0 12px rgba(255, 79, 96, 0.25) !important;
+    animation: sacudidaSuave 0.38s var(--ease-smooth);
+}
+
+@keyframes sacudidaSuave {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(5px);
+    }
+
+    60% {
+        transform: translateX(-3px);
+    }
+
+    80% {
+        transform: translateX(2px);
+    }
+}
+
+/* =========================================================
+   4. TRANSICIÓN DE BOTÓN (BARRIDO, REBOTE Y CLICK)
+   ========================================================= */
+button[type="submit"] {
+    position: relative;
     width: 100%;
-
-    padding: 12px;
-
-    margin-top: 2px;
-
+    padding: 13.5px;
+    margin-top: 6px;
     border: none;
-
-    border-radius: 5px;
-
-    background-color: var(--naranja);
-
-    color: var(--blanco);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--coral-primario) 0%, var(--coral-secundario) 100%);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
     cursor: pointer;
-
+    overflow: hidden;
+    transform: translateZ(0);
+    box-shadow: 0 8px 24px var(--coral-glow);
     transition:
-        background-color 0.2s ease,
-        transform 0.1s ease,
-        box-shadow 0.2s ease;
+        transform 0.22s var(--ease-elastic),
+        box-shadow 0.25s var(--ease-smooth),
+        background 0.3s ease;
 }
 
+/* Destello de brillo continuo con transición al hover */
+button[type="submit"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.65s cubic-bezier(0.19, 1, 0.22, 1);
+}
 
-button:hover {
-    background-color: #E85F00;
-
+button[type="submit"]:hover {
+    transform: translateY(-2.5px);
     box-shadow:
-        0 5px 12px rgba(255, 107, 0, 0.18);
+        0 14px 34px var(--coral-glow-intenso),
+        0 0 25px rgba(255, 79, 96, 0.45);
 }
 
-
-button:active {
-    background-color: #D95700;
-
-    transform: translateY(1px);
-
-    box-shadow: none;
+button[type="submit"]:hover::before {
+    left: 150%;
 }
 
+/* Efecto de amortiguación al presionar */
+button[type="submit"]:active {
+    transform: translateY(1.5px) scale(0.985);
+    box-shadow: 0 4px 14px var(--coral-glow);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
 
 /* =========================================================
-   ENLACES
+   5. TRANSICIÓN DE ENLACES CON SUBRAYADO EXPANSIVO
    ========================================================= */
+.forgot-password {
+    margin: 4px 0 20px;
+    text-align: right;
+}
 
-a {
-    color: var(--azul-petroleo);
-
+.forgot-password a,
+.account-link a {
+    position: relative;
+    color: var(--texto-enlace);
+    font-size: 12.5px;
     text-decoration: none;
-
-    transition:
-        color 0.2s ease;
+    transition: color 0.25s var(--ease-smooth), text-shadow 0.25s var(--ease-smooth);
 }
 
-
-a:hover {
-    color: var(--naranja);
-
-    text-decoration: underline;
+/* Línea de subrayado que crece desde el centro */
+.forgot-password a::after,
+.account-link a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 1.5px;
+    background-color: var(--coral-primario);
+    transition: width 0.25s var(--ease-elastic), left 0.25s var(--ease-elastic);
 }
 
+.forgot-password a:hover,
+.account-link a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
 
-/* =========================================================
-   ENLACE DE CUENTA
-   ========================================================= */
+.forgot-password a:hover::after,
+.account-link a:hover::after {
+    width: 100%;
+    left: 0;
+}
 
 .account-link {
-    margin-top: 22px;
-
+    margin-top: 24px;
     display: flex;
-
     justify-content: center;
     align-items: center;
-
-    gap: 6px;
-
-    font-size: 14px;
-
-    color: var(--gris-secundario);
-}
-
-
-.account-link a {
-    color: var(--azul-petroleo);
-
-    font-weight: 600;
-
-    text-decoration: none;
-}
-
-
-.account-link a:hover {
-    color: var(--naranja);
-
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   RECUPERAR CONTRASEÑA
-   ========================================================= */
-
-.forgot-password {
-    margin: -5px 0 20px;
-
-    text-align: right;
-
+    gap: 7px;
     font-size: 13px;
+    color: var(--texto-enlace);
+    animation: fadeInTexto 0.8s var(--ease-elastic) 0.2s both;
 }
 
+@keyframes fadeInTexto {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
 
-.forgot-password a {
-    color: var(--azul-petroleo);
-
-    text-decoration: none;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-
-
-.forgot-password a:hover {
-    color: var(--naranja);
-
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   MENSAJES
-   ========================================================= */
 
 #mensaje {
-    margin: 0 0 15px;
-
+    margin: 8px 0 14px;
     text-align: center;
-
-    font-size: 14px;
-
-    color: var(--gris-secundario);
+    font-size: 13px;
+    min-height: 18px;
+    transition: opacity 0.3s ease, transform 0.3s var(--ease-elastic);
 }
 
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-footer {
-    height: 40px;
+#mensaje.exito {
+    color: #4ade80;
+    text-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+    animation: popIn 0.3s var(--ease-elastic);
 }
 
+#mensaje.error {
+    color: #ff6b7a;
+    text-shadow: 0 0 12px rgba(255, 107, 122, 0.4);
+    animation: popIn 0.3s var(--ease-elastic);
+}
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 500px) {
-
-    header {
-        padding: 30px 15px 25px;
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
     }
 
-
-    header h1 {
-        font-size: 24px;
-    }
-
-
-    .form {
-        width: calc(100% - 30px);
-
-        padding: 25px;
-    }
-
-
-    .account-link {
-        flex-wrap: wrap;
-    }
-
-
-    body::before {
-        width: 350px;
-        height: 350px;
-
-        top: -180px;
-        left: -150px;
-    }
-
-
-    body::after {
-        width: 400px;
-        height: 400px;
-
-        right: -220px;
-        bottom: -220px;
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }

@@ -1,110 +1,89 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RappiYa</title>
-
+    <title>RappiYa - Recuperar contraseña</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <header>
         <h1>Recuperar contraseña</h1>
     </header>
-
     <main>
-
         <div class="form">
-
-            <form id="recuperarForm">
-
-                <p class="email">Correo electrónico</p>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Ingrese su correo electrónico"
-                >
+            <form id="recuperarForm" novalidate>
+                <p style="font-size: 14px; margin-top: 0; color: #666;">
+                    Ingresá el correo asociado a tu cuenta para recibir el enlace de recuperación.
+                </p>
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" placeholder="Ingrese su correo electrónico">
+                <span class="error-msg" id="error-email"></span>
 
                 <p id="mensaje"></p>
 
-                <button type="submit">
-                    Recuperar contraseña
-                </button>
-
+                <button type="submit">Enviar enlace de recuperación</button>
             </form>
-
         </div>
-
-        <div class="create-account">
-
-            <p>¿Recordaste tu contraseña?</p>
-
-            <a href="index.html">
-                Volver al inicio de sesión
-            </a>
-
+        <div class="account-link">
+            <a href="index.html">Volver al inicio de sesión</a>
         </div>
-
     </main>
-
     <footer></footer>
 
-
     <script>
-
         const formulario = document.getElementById("recuperarForm");
-        const mensaje = document.getElementById("mensaje");
+        const mensajeGeneral = document.getElementById("mensaje");
+        const inputEmail = document.getElementById("email");
+        const errorEmail = document.getElementById("error-email");
 
-
-        formulario.addEventListener("submit", async (event) => {
-
-            event.preventDefault();
-
-
-            const email = document.getElementById("email").value;
-
-
-            const respuesta = await fetch("http://localhost:3000/recuperar", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    email: email
-                })
-
-            });
-
-
-            const datos = await respuesta.json();
-
-
-            if (datos.success) {
-
-                // Por ahora pasamos directamente
-                // a la página de restablecimiento
-
-                window.location.href = "restablecer.html";
-
-            } else {
-
-                mensaje.textContent = datos.message;
-
-            }
-
+        inputEmail.addEventListener("input", () => {
+            inputEmail.classList.remove("input-error");
+            errorEmail.textContent = "";
+            errorEmail.classList.remove("activo");
         });
 
+        formulario.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            mensajeGeneral.textContent = "";
+            mensajeGeneral.className = "";
+
+            const correo = inputEmail.value.trim();
+            const patronEmail = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+
+            if (correo === "") {
+                inputEmail.classList.add("input-error");
+                errorEmail.textContent = "Ingresá un correo electrónico";
+                errorEmail.classList.add("activo");
+                return;
+            }
+
+            if (!patronEmail.test(correo)) {
+                inputEmail.classList.add("input-error");
+                errorEmail.textContent = "El formato del correo no es válido";
+                errorEmail.classList.add("activo");
+                return;
+            }
+
+            try {
+                const respuesta = await fetch("http://localhost:3000/recuperar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: correo })
+                });
+
+                const datos = await respuesta.json();
+                mensajeGeneral.className = datos.success ? "exito" : "error";
+                mensajeGeneral.textContent = datos.message;
+
+                if (datos.success) {
+                    formulario.reset();
+                }
+            } catch (error) {
+                mensajeGeneral.className = "error";
+                mensajeGeneral.textContent = "No se pudo conectar con el servidor";
+            }
+        });
     </script>
-
 </body>
-
 </html>
