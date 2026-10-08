@@ -4,8 +4,6 @@ Aplicación web de práctica orientada a la gestión de usuarios, con registro, 
 
 El proyecto utiliza un frontend desarrollado con HTML, CSS y JavaScript, un backend construido con Flask y una base de datos MySQL.
 
-> **Estado del proyecto:** desarrollo / práctica académica.
-
 ---
 
 ## 📌 Funcionalidades
@@ -36,7 +34,7 @@ El proyecto utiliza un frontend desarrollado con HTML, CSS y JavaScript, un back
 - Restablecimiento de contraseña utilizando el token.
 - Los tokens se marcan como utilizados después de completar el cambio.
 
-> Actualmente, el envío del enlace de recuperación está **simulado por consola**. El backend genera el enlace y lo muestra en la terminal en lugar de enviarlo mediante un servicio de correo.
+
 
 ---
 
@@ -267,10 +265,6 @@ RappiYa fue desarrollado como proyecto de práctica para aplicar conceptos de:
 - recuperación segura de cuentas.
 
 ---
-
-## 👨‍💻 Autor
-
-Desarrollado por **Tinchocb62**.
 
 Repositorio:  
 https://github.com/Tinchocb62/RappiYa
