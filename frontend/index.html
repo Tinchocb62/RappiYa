@@ -95,9 +95,12 @@
 
                 if (datos.success) {
                     mensajeGeneral.className = "exito";
-                    mensajeGeneral.textContent = `¡Bienvenido/a, ${datos.usuario.nombre}!`;
+                    mensajeGeneral.textContent = `¡Bienvenido/a, ${datos.usuario.nombre}! Redirigiendo...`;
                     sessionStorage.setItem("usuario", JSON.stringify(datos.usuario));
                     formulario.reset();
+                    setTimeout(() => {
+                        window.location.href = "panel.html";
+                    }, 1000);
                 } else {
                     mensajeGeneral.className = "error";
                     mensajeGeneral.textContent = datos.message;

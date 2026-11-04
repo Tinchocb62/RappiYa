@@ -1,39 +1,28 @@
-/* =========================================================
-   VARIABLES DE TIEMPO Y CURVAS DE TRANSICIÓN
-   ========================================================= */
 :root {
     --bg-base: #070a0f;
     --card-surface: rgba(14, 20, 29, 0.88);
     --card-border: rgba(255, 255, 255, 0.08);
-
     --input-surface: rgba(18, 25, 36, 0.75);
     --input-border: rgba(255, 255, 255, 0.09);
     --input-focus-border: #ff4d5e;
-
     --texto-titulo: #ffffff;
     --texto-etiqueta: #7a889b;
     --texto-placeholder: #455263;
     --texto-principal: #f3f6fa;
     --texto-enlace: #8a98a8;
-
     --coral-primario: #ff4f60;
     --coral-secundario: #ff384b;
     --coral-glow: rgba(255, 79, 96, 0.55);
     --coral-glow-intenso: rgba(255, 79, 96, 0.85);
-
     --aura-roja: rgba(230, 45, 66, 0.42);
     --aura-teal: rgba(12, 110, 128, 0.38);
-
-    /* Curvas de aceleración cinematográficas */
     --ease-elastic: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
     --trans-fast: 0.2s var(--ease-smooth);
     --trans-medium: 0.35s var(--ease-elastic);
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -50,7 +39,6 @@ body {
     padding: 24px;
 }
 
-/* Luces ambientales con transición fluida continua */
 body::before {
     content: "";
     position: fixed;
@@ -82,28 +70,15 @@ body::after {
 }
 
 @keyframes derivaLuzRoja {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    100% {
-        transform: translate(30px, 35px) scale(1.08);
-    }
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 35px) scale(1.08); }
 }
 
 @keyframes derivaLuzTeal {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    100% {
-        transform: translate(-40px, -30px) scale(1.1);
-    }
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-40px, -30px) scale(1.1); }
 }
 
-/* =========================================================
-   1. TRANSICIÓN DE ENTRADA ESCALONADA (STAGGERED LOAD)
-   ========================================================= */
 header {
     text-align: center;
     margin-bottom: 22px;
@@ -112,15 +87,8 @@ header {
 }
 
 @keyframes bajarTitulo {
-    from {
-        opacity: 0;
-        transform: translateY(-16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 header h1 {
@@ -135,7 +103,6 @@ header h1 {
     gap: 14px;
 }
 
-/* Onda expansiva continua */
 .dot-container {
     position: relative;
     display: inline-flex;
@@ -167,23 +134,10 @@ header h1 {
 }
 
 @keyframes ondaRadar {
-    0% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    70% {
-        transform: scale(3.5);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(3.5);
-        opacity: 0;
-    }
+    0% { transform: scale(1); opacity: 0.8; }
+    70%, 100% { transform: scale(3.5); opacity: 0; }
 }
 
-/* Entrada de la tarjeta con escala progresiva */
 main {
     width: 100%;
     max-width: 420px;
@@ -195,15 +149,8 @@ main {
 }
 
 @keyframes entradaCard {
-    from {
-        opacity: 0;
-        transform: translateY(28px) scale(0.96);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(28px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .form {
@@ -223,14 +170,8 @@ main {
     box-shadow: 0 35px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-}
+form { display: flex; flex-direction: column; }
 
-/* =========================================================
-   2. TRANSICIÓN EN INPUTS Y LABELS
-   ========================================================= */
 label {
     margin-bottom: 7px;
     color: var(--texto-etiqueta);
@@ -245,7 +186,6 @@ input {
     width: 100%;
     padding: 13px 15px;
     margin-bottom: 6px;
-    /* Ajustado para que el contenedor del error no salte */
     border: 1px solid var(--input-border);
     border-radius: 7px;
     background-color: var(--input-surface);
@@ -253,11 +193,7 @@ input {
     font-size: 13.5px;
     outline: none;
     transform: translateZ(0);
-    transition:
-        border-color 0.25s var(--ease-smooth),
-        background-color 0.25s var(--ease-smooth),
-        box-shadow 0.25s var(--ease-smooth),
-        transform 0.25s var(--ease-elastic);
+    transition: border-color 0.25s var(--ease-smooth), background-color 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), transform 0.25s var(--ease-elastic);
 }
 
 input::placeholder {
@@ -271,42 +207,27 @@ input:hover {
     background-color: rgba(22, 31, 44, 0.85);
 }
 
-/* Foco con sutil avance tridimensional */
 input:focus {
     border-color: var(--input-focus-border);
     background-color: rgba(24, 34, 48, 0.95);
     transform: translateY(-1px);
-    box-shadow:
-        0 0 0 3px rgba(255, 79, 96, 0.18),
-        0 8px 20px rgba(255, 79, 96, 0.12);
+    box-shadow: 0 0 0 3px rgba(255, 79, 96, 0.18), 0 8px 20px rgba(255, 79, 96, 0.12);
 }
 
-input:focus::placeholder {
-    opacity: 0.5;
-    transform: translateX(3px);
-}
+input:focus::placeholder { opacity: 0.5; transform: translateX(3px); }
 
-/* =========================================================
-   3. DESPLIEGUE SUAVE DE ERRORES (ACORDEÓN FLUIDO)
-   ========================================================= */
 .error-msg {
     color: #ff6b7a;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.2px;
     text-align: left;
-
-    /* En lugar de display: none, animamos altura y opacidad */
     max-height: 0;
     opacity: 0;
     transform: translateY(-6px);
     overflow: hidden;
     margin-bottom: 12px;
-    transition:
-        max-height 0.3s cubic-bezier(0, 1, 0, 1),
-        opacity 0.25s var(--ease-smooth),
-        transform 0.25s var(--ease-elastic),
-        margin 0.25s ease;
+    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.25s var(--ease-smooth), transform 0.25s var(--ease-elastic), margin 0.25s ease;
 }
 
 .error-msg.activo {
@@ -315,13 +236,9 @@ input:focus::placeholder {
     transform: translateY(0);
     margin-top: 4px;
     margin-bottom: 14px;
-    transition:
-        max-height 0.35s ease-in-out,
-        opacity 0.3s var(--ease-smooth),
-        transform 0.3s var(--ease-elastic);
+    transition: max-height 0.35s ease-in-out, opacity 0.3s var(--ease-smooth), transform 0.3s var(--ease-elastic);
 }
 
-/* Sacudida controlada sin romper la posición del contenedor */
 input.input-error {
     border-color: #ff4f60 !important;
     background-color: rgba(255, 79, 96, 0.08) !important;
@@ -330,32 +247,13 @@ input.input-error {
 }
 
 @keyframes sacudidaSuave {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    20% {
-        transform: translateX(-6px);
-    }
-
-    40% {
-        transform: translateX(5px);
-    }
-
-    60% {
-        transform: translateX(-3px);
-    }
-
-    80% {
-        transform: translateX(2px);
-    }
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
 }
 
-/* =========================================================
-   4. TRANSICIÓN DE BOTÓN (BARRIDO, REBOTE Y CLICK)
-   ========================================================= */
 button[type="submit"] {
     position: relative;
     width: 100%;
@@ -373,13 +271,9 @@ button[type="submit"] {
     overflow: hidden;
     transform: translateZ(0);
     box-shadow: 0 8px 24px var(--coral-glow);
-    transition:
-        transform 0.22s var(--ease-elastic),
-        box-shadow 0.25s var(--ease-smooth),
-        background 0.3s ease;
+    transition: transform 0.22s var(--ease-elastic), box-shadow 0.25s var(--ease-smooth), background 0.3s ease;
 }
 
-/* Destello de brillo continuo con transición al hover */
 button[type="submit"]::before {
     content: "";
     position: absolute;
@@ -394,32 +288,20 @@ button[type="submit"]::before {
 
 button[type="submit"]:hover {
     transform: translateY(-2.5px);
-    box-shadow:
-        0 14px 34px var(--coral-glow-intenso),
-        0 0 25px rgba(255, 79, 96, 0.45);
+    box-shadow: 0 14px 34px var(--coral-glow-intenso), 0 0 25px rgba(255, 79, 96, 0.45);
 }
 
-button[type="submit"]:hover::before {
-    left: 150%;
-}
+button[type="submit"]:hover::before { left: 150%; }
 
-/* Efecto de amortiguación al presionar */
 button[type="submit"]:active {
     transform: translateY(1.5px) scale(0.985);
     box-shadow: 0 4px 14px var(--coral-glow);
     transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
-/* =========================================================
-   5. TRANSICIÓN DE ENLACES CON SUBRAYADO EXPANSIVO
-   ========================================================= */
-.forgot-password {
-    margin: 4px 0 20px;
-    text-align: right;
-}
+.forgot-password { margin: 4px 0 20px; text-align: right; }
 
-.forgot-password a,
-.account-link a {
+.forgot-password a, .account-link a {
     position: relative;
     color: var(--texto-enlace);
     font-size: 12.5px;
@@ -427,9 +309,7 @@ button[type="submit"]:active {
     transition: color 0.25s var(--ease-smooth), text-shadow 0.25s var(--ease-smooth);
 }
 
-/* Línea de subrayado que crece desde el centro */
-.forgot-password a::after,
-.account-link a::after {
+.forgot-password a::after, .account-link a::after {
     content: "";
     position: absolute;
     bottom: -2px;
@@ -440,17 +320,12 @@ button[type="submit"]:active {
     transition: width 0.25s var(--ease-elastic), left 0.25s var(--ease-elastic);
 }
 
-.forgot-password a:hover,
-.account-link a:hover {
+.forgot-password a:hover, .account-link a:hover {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-.forgot-password a:hover::after,
-.account-link a:hover::after {
-    width: 100%;
-    left: 0;
-}
+.forgot-password a:hover::after, .account-link a:hover::after { width: 100%; left: 0; }
 
 .account-link {
     margin-top: 24px;
@@ -464,15 +339,8 @@ button[type="submit"]:active {
 }
 
 @keyframes fadeInTexto {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 #mensaje {
@@ -483,26 +351,10 @@ button[type="submit"]:active {
     transition: opacity 0.3s ease, transform 0.3s var(--ease-elastic);
 }
 
-#mensaje.exito {
-    color: #4ade80;
-    text-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
-    animation: popIn 0.3s var(--ease-elastic);
-}
-
-#mensaje.error {
-    color: #ff6b7a;
-    text-shadow: 0 0 12px rgba(255, 107, 122, 0.4);
-    animation: popIn 0.3s var(--ease-elastic);
-}
+#mensaje.exito { color: #4ade80; text-shadow: 0 0 12px rgba(74, 222, 128, 0.4); animation: popIn 0.3s var(--ease-elastic); }
+#mensaje.error { color: #ff6b7a; text-shadow: 0 0 12px rgba(255, 107, 122, 0.4); animation: popIn 0.3s var(--ease-elastic); }
 
 @keyframes popIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }

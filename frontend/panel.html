@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RappiYa | Panel de Control</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<nav class="navigation">
+  <div class="nav-links">
+    <button class="nav-button selected" id="tabProfile">👤 Mi perfil</button>
+    <button class="nav-button" id="tabUsers" hidden>👥 Gestión de usuarios</button>
+    <a href="roles.html" class="nav-button" id="linkRoles" hidden>🛡️ Roles y permisos</a>
+  </div>
+  <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+</nav>
+
+<section class="page" id="profilePage">
+  <div class="profile-header">
+    <div class="avatar" id="userAvatar">U</div>
+    <div class="profile-heading">
+      <h1 id="profileTitle">Mi perfil</h1>
+      <p class="subtitle">Consultá y actualizá tus datos personales de contacto.</p>
+    </div>
+    <span class="role-badge" id="roleBadge">Rol: Cargando...</span>
+  </div>
+
+  <div class="form-body">
+    <div class="alert alert-success" id="successAlert" hidden>
+      <span id="successText">✓ Cambios guardados con éxito. La información de tu perfil fue actualizada.</span>
+      <button class="alert-close" id="closeSuccess">&times;</button>
+    </div>
+
+    <div class="alert alert-error" id="errorAlert" hidden>
+      <span id="errorText">⚠ Por favor revisá los errores indicados abajo.</span>
+      <button class="alert-close" id="closeError">&times;</button>
+    </div>
+
+    <form id="profileForm" novalidate>
+      <div class="field">
+        <div class="field-label">
+          <label for="fullName">Nombre completo <span class="required">*</span></label>
+        </div>
+        <input id="fullName" name="nombre" placeholder="Tu nombre completo">
+        <p class="field-error" id="nameError" hidden></p>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="email">Correo electrónico</label>
+          <span class="locked">🔒 No editable</span>
+        </div>
+        <input id="email" type="email" readonly>
+        <p class="hint">El correo electrónico está vinculado a tu cuenta y no puede modificarse desde acá.</p>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="address">Dirección de entrega <span class="required">*</span></label>
+        </div>
+        <input id="address" name="direccion" placeholder="Ej: Av. Colón 1234, B° Alberdi">
+        <p class="field-error" id="addressError" hidden></p>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="phone">Teléfono <span class="required">*</span></label>
+        </div>
+        <input id="phone" type="tel" name="telefono" placeholder="+54 9 351 555-0192">
+        <p class="field-error" id="phoneError" hidden></p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="cancelProfile">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="page" id="usersPage" hidden>
+  <div class="users-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p class="subtitle">Control de bajas lógicas y estados de cuenta en el sistema.</p>
+    </div>
+    <span class="role-badge">Control de cuentas</span>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter selected" data-filter="all">Todas</button>
+    <button class="filter" data-filter="active">Activas</button>
+    <button class="filter" data-filter="inactive">Inactivas</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Registro</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="page" id="deniedPage" hidden>
+  <div class="access-denied-box">
+    <div class="lock-icon">🔒</div>
+    <div class="access-denied-title">Acceso denegado – no tenés permisos para ver esta sección</div>
+    <p class="access-denied-desc">Tu perfil de usuario no cuenta con las autorizaciones necesarias para visualizar las herramientas de administración interna.</p>
+    <button class="btn btn-primary" id="btnBackToProfile">Volver a Mi perfil</button>
+  </div>
+</section>
+
+<dialog id="deactivateDialog">
+  <h2 class="modal-title">⚠ ¿Seguro que querés desactivar esta cuenta?</h2>
+  <p class="modal-description">El usuario <strong id="targetUser"></strong> no podrá iniciar sesión en RappiYa hasta que su cuenta sea reactivada.</p>
+  <div class="warning-box">
+    <strong>ⓘ Baja lógica del sistema</strong>
+    <p>Los datos históricos, pedidos anteriores y reportes asociados se mantendrán intactos para auditoría.</p>
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="btn btn-secondary" id="cancelDeactivate">Cancelar</button>
+    <button type="button" class="btn btn-danger" id="confirmDeactivate">Confirmar desactivación</button>
+  </div>
+</dialog>
+
+<script>
+const API_URL = "http://localhost:3000";
+const usuarioGuardado = sessionStorage.getItem("usuario");
+if (!usuarioGuardado) window.location.href = "index.html";
+let usuarioActual = JSON.parse(usuarioGuardado);
+
+const $ = id => document.getElementById(id);
+let userToDeactivate = null;
+let currentFilter = "all";
+let listaUsuarios = [];
+let perfilCargado = {};
+
+function iniciales(nombre) {
+  if (!nombre) return "U";
+  const p = nombre.trim().split(" ");
+  return (p.length >= 2 ? p[0][0] + p[1][0] : nombre.substring(0, 2)).toUpperCase();
+}
+
+function escapeHTML(s) {
+  return String(s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function actualizarInterfazUsuario() {
+  $("userAvatar").textContent = iniciales(usuarioActual.nombre);
+  $("roleBadge").textContent = `Rol: ${usuarioActual.rol_nombre || "Cliente"}`;
+  const esAdmin = usuarioActual.rol_codigo === "ROLE_ADMIN";
+  $("tabUsers").hidden = !esAdmin;
+  $("linkRoles").hidden = !esAdmin;
+}
+actualizarInterfazUsuario();
+
+function mostrarSeccion(seccion) {
+  $("profilePage").hidden = seccion !== "profile";
+  $("usersPage").hidden = seccion !== "users";
+  $("deniedPage").hidden = seccion !== "denied";
+  $("tabProfile").classList.toggle("selected", seccion === "profile");
+  $("tabUsers").classList.toggle("selected", seccion === "users");
+}
+
+$("tabProfile").onclick = () => mostrarSeccion("profile");
+$("tabUsers").onclick = () => {
+  if (usuarioActual.rol_codigo !== "ROLE_ADMIN") mostrarSeccion("denied");
+  else { mostrarSeccion("users"); cargarUsuarios(); }
+};
+$("btnBackToProfile").onclick = () => mostrarSeccion("profile");
+
+async function cargarPerfil() {
+  try {
+    const res = await fetch(`${API_URL}/perfil`, { headers: { "X-User-Id": usuarioActual.id } });
+    const data = await res.json();
+    if (data.success) {
+      perfilCargado = data.perfil;
+      $("fullName").value = perfilCargado.nombre || "";
+      $("email").value = perfilCargado.email || "";
+      $("address").value = perfilCargado.direccion || "";
+      $("phone").value = perfilCargado.telefono || "";
+      $("roleBadge").textContent = `Rol: ${perfilCargado.rol_nombre}`;
+    }
+  } catch (e) {}
+}
+cargarPerfil();
+
+function limpiarErroresPerfil() {
+  ["fullName", "address", "phone"].forEach(id => $(id).classList.remove("invalid"));
+  ["nameError", "addressError", "phoneError"].forEach(id => { $(id).hidden = true; $(id).textContent = ""; });
+  $("errorAlert").hidden = true;
+}
+
+$("cancelProfile").onclick = () => {
+  $("fullName").value = perfilCargado.nombre || "";
+  $("address").value = perfilCargado.direccion || "";
+  $("phone").value = perfilCargado.telefono || "";
+  limpiarErroresPerfil();
+};
+
+["fullName", "address", "phone"].forEach(id => $(id).addEventListener("input", () => $(id).classList.remove("invalid")));
+
+$("profileForm").onsubmit = async (e) => {
+  e.preventDefault();
+  limpiarErroresPerfil();
+  const nombre = $("fullName").value.trim();
+  const direccion = $("address").value.trim();
+  const telefono = $("phone").value.trim();
+  const digitos = telefono.replace(/\D/g, "");
+  let error = false;
+
+  if (nombre.length < 3) {
+    $("fullName").classList.add("invalid");
+    $("nameError").hidden = false;
+    $("nameError").textContent = "El nombre completo debe tener al menos 3 caracteres.";
+    error = true;
+  }
+  if (!direccion) {
+    $("address").classList.add("invalid");
+    $("addressError").hidden = false;
+    $("addressError").textContent = "La dirección de entrega es obligatoria.";
+    error = true;
+  }
+  if (digitos.length < 8 || digitos.length > 15) {
+    $("phone").classList.add("invalid");
+    $("phoneError").hidden = false;
+    $("phoneError").textContent = "El teléfono debe contener entre 8 y 15 dígitos numéricos.";
+    error = true;
+  }
+  if (error) {
+    $("errorAlert").hidden = false;
+    $("errorText").textContent = "Por favor revisá los errores indicados en rojo.";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/perfil`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
+      body: JSON.stringify({ nombre, direccion, telefono })
+    });
+    const data = await res.json();
+    if (data.success) {
+      $("successAlert").hidden = false;
+      perfilCargado = { ...perfilCargado, nombre, direccion, telefono };
+      usuarioActual.nombre = nombre;
+      sessionStorage.setItem("usuario", JSON.stringify(usuarioActual));
+      actualizarInterfazUsuario();
+    } else {
+      $("errorAlert").hidden = false;
+      $("errorText").textContent = data.message || "No se pudo actualizar el perfil";
+    }
+  } catch (e) {
+    $("errorAlert").hidden = false;
+    $("errorText").textContent = "Error de conexión con el servidor";
+  }
+};
+
+$("closeSuccess").onclick = () => $("successAlert").hidden = true;
+$("closeError").onclick = () => $("errorAlert").hidden = true;
+
+async function cargarUsuarios() {
+  try {
+    const res = await fetch(`${API_URL}/usuarios`, { headers: { "X-User-Id": usuarioActual.id } });
+    const data = await res.json();
+    if (data.success) { listaUsuarios = data.usuarios; renderizarUsuarios(); }
+  } catch (e) {}
+}
+
+function renderizarUsuarios() {
+  const filtrados = listaUsuarios.filter(u => currentFilter === "all" ? true : (currentFilter === "active" ? u.estado === 1 : u.estado === 0));
+  if (!filtrados.length) {
+    $("usersTable").innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px;">No se encontraron usuarios.</td></tr>`;
+    return;
+  }
+  $("usersTable").innerHTML = filtrados.map(u => {
+    const act = u.estado === 1;
+    return `<tr>
+      <td><div class="user-cell"><div class="user-avatar-small">${iniciales(u.nombre)}</div><div><div class="user-name">${escapeHTML(u.nombre)}</div><div class="user-email">${escapeHTML(u.email)}</div></div></div></td>
+      <td>${escapeHTML(u.rol_nombre || "Cliente")}</td>
+      <td>${escapeHTML(u.fecha_creacion || "-")}</td>
+      <td><span class="status ${act ? "active" : "inactive"}">● ${act ? "Activa" : "Inactiva"}</span></td>
+      <td><button class="action-btn ${act ? "action-danger" : "action-success"}" data-user-id="${u.id}" data-action="${act ? "deactivate" : "activate"}">${act ? "⊘ Desactivar" : "↻ Reactivar"}</button></td>
+    </tr>`;
+  }).join("");
+}
+
+document.querySelectorAll("[data-filter]").forEach(btn => {
+  btn.onclick = () => {
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach(b => b.classList.toggle("selected", b === btn));
+    renderizarUsuarios();
+  };
+});
+
+async function cambiarEstado(id, estado) {
+  try {
+    const res = await fetch(`${API_URL}/usuarios/${id}/estado`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
+      body: JSON.stringify({ estado })
+    });
+    const data = await res.json();
+    if (data.success) cargarUsuarios();
+    else alert(data.message);
+  } catch (e) { alert("Error de conexión"); }
+}
+
+$("usersTable").onclick = (e) => {
+  const btn = e.target.closest("[data-user-id]");
+  if (!btn) return;
+  const user = listaUsuarios.find(u => u.id === Number(btn.dataset.userId));
+  if (!user) return;
+  if (btn.dataset.action === "activate") cambiarEstado(user.id, 1);
+  else {
+    userToDeactivate = user;
+    $("targetUser").textContent = user.nombre;
+    $("deactivateDialog").showModal();
+  }
+};
+
+$("cancelDeactivate").onclick = () => { $("deactivateDialog").close(); userToDeactivate = null; };
+$("confirmDeactivate").onclick = async () => {
+  if (!userToDeactivate) return;
+  $("deactivateDialog").close();
+  await cambiarEstado(userToDeactivate.id, 0);
+  userToDeactivate = null;
+};
+
+$("logoutBtn").onclick = async () => {
+  try { await fetch(`${API_URL}/logout`, { method: "POST" }); } catch (e) {}
+  sessionStorage.removeItem("usuario");
+  window.location.href = "index.html";
+};
+</script>
+</body>
+</html>

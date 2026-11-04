@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RappiYa | Gestión de Roles y Permisos</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<div class="container" id="adminContainer">
+  <div class="top-bar">
+    <a href="panel.html" class="back-link">⬅ Volver al Panel</a>
+    <span id="adminGreeting" style="font-weight: 600;">Admin</span>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="eyebrow">RappiYa Admin</div>
+      <h1>Gestión de Roles y Permisos</h1>
+    </div>
+    <button class="primary" id="btnNewRole">+ Nuevo Rol</button>
+  </div>
+
+  <div class="alert alert-success" id="alertSuccess" hidden><span id="alertSuccessText"></span></div>
+  <div class="alert alert-error" id="alertError" hidden><span id="alertErrorText"></span></div>
+
+  <div class="card">
+    <div class="card-title">Roles del Sistema</div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="rolesTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gestión de Usuarios y Asignación de Roles</div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo Electrónico</th>
+            <th>Rol Actual</th>
+            <th style="text-align: right;">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="deniedContainer" hidden>
+  <div class="access-denied-wrap">
+    <div class="lock-icon">🔒</div>
+    <div class="access-denied-title">Acceso denegado – no tenés permisos para ver esta sección</div>
+    <p class="access-denied-desc">Tu perfil de usuario no cuenta con las autorizaciones necesarias para visualizar el módulo de administración interna de roles y permisos.</p>
+    <a href="panel.html" class="primary" style="text-decoration:none; display:inline-block;">Volver al inicio</a>
+  </div>
+</div>
+
+<dialog id="roleModal">
+  <div class="modal-header">
+    <h2 id="modalTitle">Nuevo rol</h2>
+    <button type="button" id="closeModal" style="background:none; border:none; font-size:20px;">&times;</button>
+  </div>
+  <form id="roleForm">
+    <div class="form-group">
+      <label for="roleCode">Código de rol *</label>
+      <input id="roleCode" name="codigo" placeholder="Ej: ROLE_AUDITOR" required>
+      <small style="color:var(--muted); font-size:11px;">Debe comenzar con "ROLE_". Una vez creado es inmutable.</small>
+    </div>
+    <div class="form-group">
+      <label for="roleName">Nombre del rol *</label>
+      <input id="roleName" name="nombre" placeholder="Ej: Auditor Financiero" required>
+    </div>
+    <div class="form-group">
+      <label for="roleDescription">Descripción</label>
+      <textarea id="roleDescription" name="descripcion" rows="3" placeholder="Descripción de los accesos y responsabilidades"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="back-link" id="cancelModal">Cancelar</button>
+      <button type="submit" class="primary">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const API_URL = "http://localhost:3000";
+const usuarioGuardado = sessionStorage.getItem("usuario");
+if (!usuarioGuardado) window.location.href = "index.html";
+const usuarioActual = JSON.parse(usuarioGuardado);
+const $ = id => document.getElementById(id);
+
+let rolesList = [];
+let usersList = [];
+let editingRoleId = null;
+
+function escapeHTML(s) {
+  return String(s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function mostrarMensaje(texto, tipo = "success") {
+  $("alertSuccess").hidden = true;
+  $("alertError").hidden = true;
+  const box = tipo === "success" ? $("alertSuccess") : $("alertError");
+  const span = tipo === "success" ? $("alertSuccessText") : $("alertErrorText");
+  span.textContent = texto;
+  box.hidden = false;
+  setTimeout(() => box.hidden = true, 4000);
+}
+
+async function cargarRoles() {
+  try {
+    const res = await fetch(`${API_URL}/roles`, { headers: { "X-User-Id": usuarioActual.id } });
+    const data = await res.json();
+    if (data.success) { rolesList = data.roles; renderizarRoles(); }
+  } catch (e) { mostrarMensaje("Error al obtener roles", "error"); }
+}
+
+function renderizarRoles() {
+  $("rolesTableBody").innerHTML = rolesList.map(r => {
+    const act = r.activo === 1;
+    return `<tr>
+      <td><span class="code-badge">${escapeHTML(r.codigo)}</span></td>
+      <td><strong>${escapeHTML(r.nombre)}</strong></td>
+      <td style="color:#606470;">${escapeHTML(r.descripcion || "-")}</td>
+      <td><span class="status-badge ${act ? "active" : "inactive"}">● ${act ? "Activo" : "Inactivo"}</span></td>
+      <td style="text-align: right;">
+        <button class="btn-icon" data-action="edit" data-id="${r.id}">✏ Editar</button>
+        ${r.codigo !== "ROLE_ADMIN" ? `<button class="btn-icon" data-action="toggle" data-id="${r.id}">${act ? "⊘ Desactivar" : "✓ Activar"}</button>` : ""}
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+async function cargarUsuarios() {
+  try {
+    const res = await fetch(`${API_URL}/usuarios`, { headers: { "X-User-Id": usuarioActual.id } });
+    const data = await res.json();
+    if (data.success) { usersList = data.usuarios; renderizarUsuarios(); }
+  } catch (e) {}
+}
+
+function renderizarUsuarios() {
+  $("usersTableBody").innerHTML = usersList.map(u => {
+    const opts = rolesList.map(r => `<option value="${r.id}" ${u.rol_id === r.id ? "selected" : ""} ${r.activo === 0 ? "disabled" : ""}>${escapeHTML(r.nombre)} ${r.activo === 0 ? "(Inactivo)" : ""}</option>`).join("");
+    return `<tr>
+      <td><strong>${escapeHTML(u.nombre)}</strong></td>
+      <td style="color:var(--muted);">${escapeHTML(u.email)}</td>
+      <td><select class="role-select" id="select-user-${u.id}">${opts}</select></td>
+      <td style="text-align: right;"><button class="btn-sm-save" data-user-id="${u.id}">Guardar</button></td>
+    </tr>`;
+  }).join("");
+}
+
+if (usuarioActual.rol_codigo !== "ROLE_ADMIN") {
+  $("adminContainer").hidden = true;
+  $("deniedContainer").hidden = false;
+} else {
+  $("adminGreeting").textContent = `👤 ${usuarioActual.nombre} (${usuarioActual.rol_nombre || "Admin"})`;
+  cargarRoles().then(cargarUsuarios);
+}
+
+$("btnNewRole").onclick = () => {
+  editingRoleId = null;
+  $("roleForm").reset();
+  $("roleCode").readOnly = false;
+  $("modalTitle").textContent = "Nuevo Rol";
+  $("roleModal").showModal();
+};
+
+$("roleForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const codigo = $("roleCode").value.trim().toUpperCase();
+  const nombre = $("roleName").value.trim();
+  const descripcion = $("roleDescription").value.trim();
+  if (!codigo.startsWith("ROLE_")) return alert("El código debe comenzar con 'ROLE_'");
+
+  const url = editingRoleId ? `${API_URL}/roles/${editingRoleId}` : `${API_URL}/roles`;
+  const method = editingRoleId ? "PUT" : "POST";
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
+      body: JSON.stringify({ codigo, nombre, descripcion })
+    });
+    const data = await res.json();
+    if (data.success) {
+      $("roleModal").close();
+      mostrarMensaje(data.message);
+      await cargarRoles();
+      await cargarUsuarios();
+    } else alert(data.message);
+  } catch (e) { alert("Error al guardar el rol"); }
+};
+
+$("rolesTableBody").onclick = async (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const rol = rolesList.find(r => r.id === Number(btn.dataset.id));
+  if (!rol) return;
+
+  if (btn.dataset.action === "edit") {
+    editingRoleId = rol.id;
+    $("roleCode").value = rol.codigo;
+    $("roleCode").readOnly = true;
+    $("roleName").value = rol.nombre;
+    $("roleDescription").value = rol.descripcion || "";
+    $("modalTitle").textContent = "Editar Rol";
+    $("roleModal").showModal();
+  } else {
+    try {
+      const res = await fetch(`${API_URL}/roles/${rol.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
+        body: JSON.stringify({ activo: rol.activo === 1 ? 0 : 1 })
+      });
+      const data = await res.json();
+      if (data.success) { mostrarMensaje(data.message); await cargarRoles(); await cargarUsuarios(); }
+      else alert(data.message);
+    } catch (e) { alert("Error al cambiar estado del rol"); }
+  }
+};
+
+$("usersTableBody").onclick = async (e) => {
+  const btn = e.target.closest("[data-user-id]");
+  if (!btn) return;
+  const userId = Number(btn.dataset.userId);
+  const select = $(`select-user-${userId}`);
+  try {
+    const res = await fetch(`${API_URL}/usuarios/${userId}/rol`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
+      body: JSON.stringify({ rol_id: Number(select.value) })
+    });
+    const data = await res.json();
+    if (data.success) { mostrarMensaje(data.message); await cargarUsuarios(); }
+    else alert(data.message);
+  } catch (e) { alert("Error al actualizar rol"); }
+};
+
+$("closeModal").onclick = () => $("roleModal").close();
+$("cancelModal").onclick = () => $("roleModal").close();
+</script>
+</body>
+</html>
