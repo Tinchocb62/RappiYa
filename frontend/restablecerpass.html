@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RappiYa - Restablecer contraseña</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
@@ -32,7 +32,8 @@
     </main>
     <footer></footer>
 
-    <script>
+    <script src="js/api.js"></script>
+<script>
         const formulario = document.getElementById("restablecerForm");
         const mensajeGeneral = document.getElementById("mensaje");
         const btnCambiar = document.getElementById("btnCambiar");
@@ -60,15 +61,40 @@
 
         const parametros = new URLSearchParams(window.location.search);
         const token = parametros.get("token");
+        let enlaceValido = false;
+        btnCambiar.disabled = true;
 
         if (!token) {
             mensajeGeneral.className = "error";
             mensajeGeneral.textContent = "Enlace inválido o código no encontrado.";
             btnCambiar.disabled = true;
+        } else {
+            mensajeGeneral.textContent = "Verificando enlace...";
+            apiFetch(`${window.RAPPIYA_API}/restablecer/validar`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token })
+            }).then(async (respuesta) => {
+                const datos = await respuesta.json();
+                enlaceValido = respuesta.ok && datos.success;
+                btnCambiar.disabled = !enlaceValido;
+                mensajeGeneral.className = enlaceValido ? "" : "error";
+                mensajeGeneral.textContent = enlaceValido ? "" : datos.message;
+                if (!enlaceValido) {
+                    const enlace = document.createElement("a");
+                    enlace.href = "recuperarpass.html";
+                    enlace.textContent = "Solicitar un enlace nuevo";
+                    mensajeGeneral.after(enlace);
+                }
+            }).catch(() => {
+                mensajeGeneral.className = "error";
+                mensajeGeneral.textContent = "No se pudo verificar el enlace. Revisá la conexión y recargá la página.";
+            });
         }
 
         formulario.addEventListener("submit", async (event) => {
             event.preventDefault();
+            if (!enlaceValido) return;
             mensajeGeneral.textContent = "";
             mensajeGeneral.className = "";
 
@@ -100,7 +126,7 @@
             if (hayErrores) return;
 
             try {
-                const respuesta = await fetch("http://localhost:3000/restablecer", {
+                const respuesta = await apiFetch(`${window.RAPPIYA_API}/restablecer`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ token: token, password: pass })

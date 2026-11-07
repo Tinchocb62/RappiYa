@@ -3,345 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RappiYa | Panel de Control</title>
-<link rel="stylesheet" href="panel.css">
+<title>RappiYa | Panel</title>
+<link rel="stylesheet" href="css/panel.css">
+<style id="sessionGuard">html { visibility: hidden; }</style>
 </head>
 <body>
 
-<nav class="navigation">
-  <div class="nav-links">
-    <button class="nav-button selected" id="tabProfile">👤 Mi perfil</button>
-    <button class="nav-button" id="tabUsers" hidden>👥 Gestión de usuarios</button>
-    <a href="roles.html" class="nav-button" id="linkRoles" hidden>🛡️ Roles y permisos</a>
-  </div>
-  <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
-</nav>
-
-<section class="page" id="profilePage">
-  <div class="profile-header">
-    <div class="avatar" id="userAvatar">U</div>
-    <div class="profile-heading">
-      <h1 id="profileTitle">Mi perfil</h1>
-      <p class="subtitle">Consultá y actualizá tus datos personales de contacto.</p>
-    </div>
-    <span class="role-badge" id="roleBadge">Rol: Cargando...</span>
-  </div>
-
-  <div class="form-body">
-    <div class="alert alert-success" id="successAlert" hidden>
-      <span id="successText">✓ Cambios guardados con éxito. La información de tu perfil fue actualizada.</span>
-      <button class="alert-close" id="closeSuccess">&times;</button>
+<div class="app-layout">
+  <!-- Barra lateral -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-info">
+        <span class="brand-name">RappiYa</span>
+        <span class="brand-tag">Workspace</span>
+      </div>
     </div>
 
-    <div class="alert alert-error" id="errorAlert" hidden>
-      <span id="errorText">⚠ Por favor revisá los errores indicados abajo.</span>
-      <button class="alert-close" id="closeError">&times;</button>
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">U</div>
+      <div class="sidebar-user-details">
+        <div class="sidebar-user-name" id="sidebarUserName">Cargando...</div>
+        <div class="sidebar-user-role" id="sidebarUserRole">...</div>
+      </div>
     </div>
 
-    <form id="profileForm" novalidate>
-      <div class="field">
-        <div class="field-label">
-          <label for="fullName">Nombre completo <span class="required">*</span></label>
-        </div>
-        <input id="fullName" name="nombre" placeholder="Tu nombre completo">
-        <p class="field-error" id="nameError" hidden></p>
-      </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <button class="nav-item selected" id="tabProfile">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </span>
+        <span class="nav-text">Mi perfil</span>
+      </button>
 
-      <div class="field">
-        <div class="field-label">
-          <label for="email">Correo electrónico</label>
-          <span class="locked">🔒 No editable</span>
-        </div>
-        <input id="email" type="email" readonly>
-        <p class="hint">El correo electrónico está vinculado a tu cuenta y no puede modificarse desde acá.</p>
-      </div>
+      <div class="nav-section-title" id="adminSectionHeader" hidden>Administración</div>
+      <button class="nav-item" id="tabUsers" hidden>
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-3-3.87"></path><path d="M9 21v-2a4 4 0 0 0-4-4H4a4 4 0 0 0-4 4v2"></path><circle cx="7" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </span>
+        <span class="nav-text">Gestión de usuarios</span>
+      </button>
+      <button class="nav-item" id="tabRoles" hidden>
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </span>
+        <span class="nav-text">Roles y permisos</span>
+      </button>
+    </nav>
 
-      <div class="field">
-        <div class="field-label">
-          <label for="address">Dirección de entrega <span class="required">*</span></label>
-        </div>
-        <input id="address" name="direccion" placeholder="Ej: Av. Colón 1234, B° Alberdi">
-        <p class="field-error" id="addressError" hidden></p>
-      </div>
-
-      <div class="field">
-        <div class="field-label">
-          <label for="phone">Teléfono <span class="required">*</span></label>
-        </div>
-        <input id="phone" type="tel" name="telefono" placeholder="+54 9 351 555-0192">
-        <p class="field-error" id="phoneError" hidden></p>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="cancelProfile">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="saveBtn">Guardar cambios</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-<section class="page" id="usersPage" hidden>
-  <div class="users-header">
-    <div>
-      <h1>Gestión de Usuarios</h1>
-      <p class="subtitle">Control de bajas lógicas y estados de cuenta en el sistema.</p>
+    <div class="sidebar-footer">
+      <button class="logout-btn-full" id="logoutBtn">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </span>
+        <span>Cerrar sesión</span>
+      </button>
     </div>
-    <span class="role-badge">Control de cuentas</span>
-  </div>
+  </aside>
 
-  <div class="filters" id="filters">
-    <button class="filter selected" data-filter="all">Todas</button>
-    <button class="filter" data-filter="active">Activas</button>
-    <button class="filter" data-filter="inactive">Inactivas</button>
-  </div>
+  <!-- Área principal -->
+  <main class="main-content">
+    <!-- Pestaña: Mi perfil -->
+    <section class="page" id="profilePage">
+      <div class="page-header">
+        <div>
+          <h1>Mi perfil</h1>
+          <p class="subtitle">Consultá y actualizá tus datos personales de contacto.</p>
+        </div>
+        <span class="role-badge" id="roleBadge">Rol: Cargando...</span>
+      </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Registro</th>
-          <th>Estado</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody id="usersTable"></tbody>
-    </table>
-  </div>
-</section>
+      <div class="form-body">
+        <div class="alert alert-success" id="profileSuccess" hidden>
+          <span id="profileSuccessText">Cambios guardados con éxito.</span>
+          <button class="alert-close" onclick="this.parentElement.hidden=true">&times;</button>
+        </div>
+        <div class="alert alert-error" id="profileError" hidden>
+          <span id="profileErrorText">Por favor revisá los errores indicados.</span>
+          <button class="alert-close" onclick="this.parentElement.hidden=true">&times;</button>
+        </div>
 
-<section class="page" id="deniedPage" hidden>
-  <div class="access-denied-box">
-    <div class="lock-icon">🔒</div>
-    <div class="access-denied-title">Acceso denegado – no tenés permisos para ver esta sección</div>
-    <p class="access-denied-desc">Tu perfil de usuario no cuenta con las autorizaciones necesarias para visualizar las herramientas de administración interna.</p>
-    <button class="btn btn-primary" id="btnBackToProfile">Volver a Mi perfil</button>
-  </div>
-</section>
+        <form id="profileForm" novalidate>
+          <div class="field">
+            <label for="fullName">Nombre completo <span class="required">*</span></label>
+            <input id="fullName" name="nombre" placeholder="Tu nombre completo">
+            <p class="field-error" id="nameError" hidden></p>
+          </div>
+          <div class="field">
+            <label for="email">Correo electrónico <span class="locked">No editable</span></label>
+            <input id="email" type="email" readonly>
+            <p class="hint">El correo vinculado a tu cuenta no puede modificarse.</p>
+          </div>
+          <div class="field">
+            <label for="address">Dirección de entrega <span class="required">*</span></label>
+            <input id="address" name="direccion" placeholder="Ej: Av. Colón 1234, B° Alberdi">
+            <p class="field-error" id="addressError" hidden></p>
+          </div>
+          <div class="field">
+            <label for="phone">Teléfono <span class="required">*</span></label>
+            <input id="phone" type="tel" name="telefono" placeholder="+54 9 351 555-0192">
+            <p class="field-error" id="phoneError" hidden></p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelProfile">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </section>
 
+    <!-- Pestaña: Gestión de usuarios -->
+    <section class="page" id="usersPage" hidden>
+      <div class="page-header">
+        <div>
+          <h1>Gestión de Usuarios</h1>
+          <p class="subtitle">Control de bajas lógicas y estados de cuenta en el sistema.</p>
+        </div>
+      </div>
+      <div class="filters">
+        <button class="filter selected" data-filter="all">Todas</button>
+        <button class="filter" data-filter="active">Activas</button>
+        <button class="filter" data-filter="inactive">Inactivas</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Registro</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Pestaña: Roles y permisos -->
+    <section class="page" id="rolesPage" hidden>
+      <div class="page-header">
+        <div>
+          <h1>Gestión de Roles y Permisos</h1>
+          <p class="subtitle">Configuración global de roles y asignación a cuentas.</p>
+        </div>
+        <button class="btn btn-primary" id="btnNewRole">Nuevo Rol</button>
+      </div>
+
+      <div class="alert alert-success" id="roleSuccess" hidden>
+        <span id="roleSuccessText"></span>
+        <button class="alert-close" onclick="this.parentElement.hidden=true">&times;</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Roles del Sistema</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="rolesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Asignación de Roles a Usuarios</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol Actual</th>
+                <th style="text-align: right;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="usersRolesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modales -->
 <dialog id="deactivateDialog">
-  <h2 class="modal-title">⚠ ¿Seguro que querés desactivar esta cuenta?</h2>
-  <p class="modal-description">El usuario <strong id="targetUser"></strong> no podrá iniciar sesión en RappiYa hasta que su cuenta sea reactivada.</p>
-  <div class="warning-box">
-    <strong>ⓘ Baja lógica del sistema</strong>
-    <p>Los datos históricos, pedidos anteriores y reportes asociados se mantendrán intactos para auditoría.</p>
-  </div>
+  <h2 class="modal-title">Confirmar desactivación</h2>
+  <p class="modal-description">El usuario <strong id="targetUser"></strong> no podrá iniciar sesión hasta reactivarlo.</p>
+  <div class="warning-box">Baja lógica: los pedidos e historial se mantienen intactos.</div>
   <div class="modal-actions">
-    <button type="button" class="btn btn-secondary" id="cancelDeactivate">Cancelar</button>
-    <button type="button" class="btn btn-danger" id="confirmDeactivate">Confirmar desactivación</button>
+    <button type="button" class="btn btn-secondary" onclick="$('deactivateDialog').close()">Cancelar</button>
+    <button type="button" class="btn btn-danger" id="confirmDeactivate">Desactivar</button>
   </div>
 </dialog>
 
-<script>
-const API_URL = "http://localhost:3000";
-const usuarioGuardado = sessionStorage.getItem("usuario");
-if (!usuarioGuardado) window.location.href = "index.html";
-let usuarioActual = JSON.parse(usuarioGuardado);
+<dialog id="roleModal">
+  <div class="modal-header">
+    <h2 id="modalTitle">Nuevo rol</h2>
+    <button type="button" onclick="$('roleModal').close()" style="background:none;border:0;font-size:18px;">&times;</button>
+  </div>
+  <form id="roleForm">
+    <div class="form-group">
+      <label for="roleCode">Código de rol *</label>
+      <input id="roleCode" name="codigo" placeholder="Ej: ROLE_AUDITOR" required>
+      <small class="hint">Debe comenzar con ROLE_.</small>
+    </div>
+    <div class="form-group">
+      <label for="roleName">Nombre del rol *</label>
+      <input id="roleName" name="nombre" placeholder="Ej: Auditor" required>
+    </div>
+    <div class="form-group">
+      <label for="roleDescription">Descripción</label>
+      <textarea id="roleDescription" name="descripcion" rows="2" placeholder="Responsabilidades del rol"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="$('roleModal').close()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</dialog>
 
-const $ = id => document.getElementById(id);
-let userToDeactivate = null;
-let currentFilter = "all";
-let listaUsuarios = [];
-let perfilCargado = {};
-
-function iniciales(nombre) {
-  if (!nombre) return "U";
-  const p = nombre.trim().split(" ");
-  return (p.length >= 2 ? p[0][0] + p[1][0] : nombre.substring(0, 2)).toUpperCase();
-}
-
-function escapeHTML(s) {
-  return String(s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-}
-
-function actualizarInterfazUsuario() {
-  $("userAvatar").textContent = iniciales(usuarioActual.nombre);
-  $("roleBadge").textContent = `Rol: ${usuarioActual.rol_nombre || "Cliente"}`;
-  const esAdmin = usuarioActual.rol_codigo === "ROLE_ADMIN";
-  $("tabUsers").hidden = !esAdmin;
-  $("linkRoles").hidden = !esAdmin;
-}
-actualizarInterfazUsuario();
-
-function mostrarSeccion(seccion) {
-  $("profilePage").hidden = seccion !== "profile";
-  $("usersPage").hidden = seccion !== "users";
-  $("deniedPage").hidden = seccion !== "denied";
-  $("tabProfile").classList.toggle("selected", seccion === "profile");
-  $("tabUsers").classList.toggle("selected", seccion === "users");
-}
-
-$("tabProfile").onclick = () => mostrarSeccion("profile");
-$("tabUsers").onclick = () => {
-  if (usuarioActual.rol_codigo !== "ROLE_ADMIN") mostrarSeccion("denied");
-  else { mostrarSeccion("users"); cargarUsuarios(); }
-};
-$("btnBackToProfile").onclick = () => mostrarSeccion("profile");
-
-async function cargarPerfil() {
-  try {
-    const res = await fetch(`${API_URL}/perfil`, { headers: { "X-User-Id": usuarioActual.id } });
-    const data = await res.json();
-    if (data.success) {
-      perfilCargado = data.perfil;
-      $("fullName").value = perfilCargado.nombre || "";
-      $("email").value = perfilCargado.email || "";
-      $("address").value = perfilCargado.direccion || "";
-      $("phone").value = perfilCargado.telefono || "";
-      $("roleBadge").textContent = `Rol: ${perfilCargado.rol_nombre}`;
-    }
-  } catch (e) {}
-}
-cargarPerfil();
-
-function limpiarErroresPerfil() {
-  ["fullName", "address", "phone"].forEach(id => $(id).classList.remove("invalid"));
-  ["nameError", "addressError", "phoneError"].forEach(id => { $(id).hidden = true; $(id).textContent = ""; });
-  $("errorAlert").hidden = true;
-}
-
-$("cancelProfile").onclick = () => {
-  $("fullName").value = perfilCargado.nombre || "";
-  $("address").value = perfilCargado.direccion || "";
-  $("phone").value = perfilCargado.telefono || "";
-  limpiarErroresPerfil();
-};
-
-["fullName", "address", "phone"].forEach(id => $(id).addEventListener("input", () => $(id).classList.remove("invalid")));
-
-$("profileForm").onsubmit = async (e) => {
-  e.preventDefault();
-  limpiarErroresPerfil();
-  const nombre = $("fullName").value.trim();
-  const direccion = $("address").value.trim();
-  const telefono = $("phone").value.trim();
-  const digitos = telefono.replace(/\D/g, "");
-  let error = false;
-
-  if (nombre.length < 3) {
-    $("fullName").classList.add("invalid");
-    $("nameError").hidden = false;
-    $("nameError").textContent = "El nombre completo debe tener al menos 3 caracteres.";
-    error = true;
-  }
-  if (!direccion) {
-    $("address").classList.add("invalid");
-    $("addressError").hidden = false;
-    $("addressError").textContent = "La dirección de entrega es obligatoria.";
-    error = true;
-  }
-  if (digitos.length < 8 || digitos.length > 15) {
-    $("phone").classList.add("invalid");
-    $("phoneError").hidden = false;
-    $("phoneError").textContent = "El teléfono debe contener entre 8 y 15 dígitos numéricos.";
-    error = true;
-  }
-  if (error) {
-    $("errorAlert").hidden = false;
-    $("errorText").textContent = "Por favor revisá los errores indicados en rojo.";
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_URL}/perfil`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
-      body: JSON.stringify({ nombre, direccion, telefono })
-    });
-    const data = await res.json();
-    if (data.success) {
-      $("successAlert").hidden = false;
-      perfilCargado = { ...perfilCargado, nombre, direccion, telefono };
-      usuarioActual.nombre = nombre;
-      sessionStorage.setItem("usuario", JSON.stringify(usuarioActual));
-      actualizarInterfazUsuario();
-    } else {
-      $("errorAlert").hidden = false;
-      $("errorText").textContent = data.message || "No se pudo actualizar el perfil";
-    }
-  } catch (e) {
-    $("errorAlert").hidden = false;
-    $("errorText").textContent = "Error de conexión con el servidor";
-  }
-};
-
-$("closeSuccess").onclick = () => $("successAlert").hidden = true;
-$("closeError").onclick = () => $("errorAlert").hidden = true;
-
-async function cargarUsuarios() {
-  try {
-    const res = await fetch(`${API_URL}/usuarios`, { headers: { "X-User-Id": usuarioActual.id } });
-    const data = await res.json();
-    if (data.success) { listaUsuarios = data.usuarios; renderizarUsuarios(); }
-  } catch (e) {}
-}
-
-function renderizarUsuarios() {
-  const filtrados = listaUsuarios.filter(u => currentFilter === "all" ? true : (currentFilter === "active" ? u.estado === 1 : u.estado === 0));
-  if (!filtrados.length) {
-    $("usersTable").innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px;">No se encontraron usuarios.</td></tr>`;
-    return;
-  }
-  $("usersTable").innerHTML = filtrados.map(u => {
-    const act = u.estado === 1;
-    return `<tr>
-      <td><div class="user-cell"><div class="user-avatar-small">${iniciales(u.nombre)}</div><div><div class="user-name">${escapeHTML(u.nombre)}</div><div class="user-email">${escapeHTML(u.email)}</div></div></div></td>
-      <td>${escapeHTML(u.rol_nombre || "Cliente")}</td>
-      <td>${escapeHTML(u.fecha_creacion || "-")}</td>
-      <td><span class="status ${act ? "active" : "inactive"}">● ${act ? "Activa" : "Inactiva"}</span></td>
-      <td><button class="action-btn ${act ? "action-danger" : "action-success"}" data-user-id="${u.id}" data-action="${act ? "deactivate" : "activate"}">${act ? "⊘ Desactivar" : "↻ Reactivar"}</button></td>
-    </tr>`;
-  }).join("");
-}
-
-document.querySelectorAll("[data-filter]").forEach(btn => {
-  btn.onclick = () => {
-    currentFilter = btn.dataset.filter;
-    document.querySelectorAll("[data-filter]").forEach(b => b.classList.toggle("selected", b === btn));
-    renderizarUsuarios();
-  };
-});
-
-async function cambiarEstado(id, estado) {
-  try {
-    const res = await fetch(`${API_URL}/usuarios/${id}/estado`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-User-Id": usuarioActual.id },
-      body: JSON.stringify({ estado })
-    });
-    const data = await res.json();
-    if (data.success) cargarUsuarios();
-    else alert(data.message);
-  } catch (e) { alert("Error de conexión"); }
-}
-
-$("usersTable").onclick = (e) => {
-  const btn = e.target.closest("[data-user-id]");
-  if (!btn) return;
-  const user = listaUsuarios.find(u => u.id === Number(btn.dataset.userId));
-  if (!user) return;
-  if (btn.dataset.action === "activate") cambiarEstado(user.id, 1);
-  else {
-    userToDeactivate = user;
-    $("targetUser").textContent = user.nombre;
-    $("deactivateDialog").showModal();
-  }
-};
-
-$("cancelDeactivate").onclick = () => { $("deactivateDialog").close(); userToDeactivate = null; };
-$("confirmDeactivate").onclick = async () => {
-  if (!userToDeactivate) return;
-  $("deactivateDialog").close();
-  await cambiarEstado(userToDeactivate.id, 0);
-  userToDeactivate = null;
-};
-
-$("logoutBtn").onclick = async () => {
-  try { await fetch(`${API_URL}/logout`, { method: "POST" }); } catch (e) {}
-  sessionStorage.removeItem("usuario");
-  window.location.href = "index.html";
-};
-</script>
+<script src="js/api.js" data-protected></script>
+<script src="js/panel.js"></script>
 </body>
 </html>

@@ -39,3 +39,17 @@ CREATE TABLE IF NOT EXISTS recuperacion_tokens (
     usado TINYINT(1) DEFAULT 0,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS auditoria (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    actor_id INT NOT NULL,
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    accion VARCHAR(50) NOT NULL,
+    entidad VARCHAR(50) NOT NULL,
+    entidad_id INT NOT NULL,
+    valor_anterior LONGTEXT NULL,
+    valor_nuevo LONGTEXT NOT NULL,
+    INDEX idx_auditoria_entidad (entidad, entidad_id),
+    INDEX idx_auditoria_actor_fecha (actor_id, fecha),
+    FOREIGN KEY (actor_id) REFERENCES usuarios(id) ON DELETE RESTRICT
+);

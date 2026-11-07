@@ -72,7 +72,7 @@ formulario.addEventListener("submit", async function (event) {
     if (hayErrores) return;
 
     try {
-        const respuesta = await fetch("http://localhost:3000/registro", {
+        const respuesta = await apiFetch(`${window.RAPPIYA_API}/registro`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

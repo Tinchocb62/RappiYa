@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RappiYa - Inicio de sesión</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
@@ -37,7 +37,8 @@
     </main>
     <footer></footer>
 
-    <script>
+    <script src="js/api.js"></script>
+<script>
         const formulario = document.getElementById("loginForm");
         const mensajeGeneral = document.getElementById("mensaje");
 
@@ -82,7 +83,7 @@
             if (hayErrores) return;
 
             try {
-                const respuesta = await fetch("http://localhost:3000/login", {
+                const respuesta = await apiFetch(`${window.RAPPIYA_API}/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
